@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { accessToken } from './spotify'
+import { accessToken } from './spotify';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import Profile from './pages/Profile';
+import Login from './pages/Login';
 
 function App() {
   // function variables; initially sets token var to null
@@ -10,18 +13,21 @@ function App() {
     setToken(accessToken)
   }, [])
 
-  console.log(token)
+  // console.log(token)
 
   return (
     <>
-      {!token ? (
-        <p>no token</p>
-      ) : (
-        <div>
-          <h1>Current token is {token}</h1>
-          <LoginButton />
-        </div>
-      )}
+      <div className='App'>
+        {!token ? (
+          <Login />
+        ) : (
+          <Router>
+            <Routes>
+              <Route path="/" element={<Profile/>}/>
+            </Routes>
+          </Router>
+        )}
+      </div>
     </>
   )
 }
