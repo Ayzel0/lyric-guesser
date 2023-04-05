@@ -1,0 +1,13 @@
+.login_button {
+    border-radius: 50%;
+    background: #199c2b;
+    transition: all 0.3s ease;
+    display: inline-block;
+    color: white;
+    font-weight: 700;
+}
+
+.login_button:hover {
+    text-decoration: none;
+    filter: brightness(0.8);
+}
