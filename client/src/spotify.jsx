@@ -1,13 +1,111 @@
 import axios from 'axios';
 
+// keys for the localstorage key-value pairs
+const LOCALSTORAGE_KEYS = {
+    accessToken: 'spotify_access_token',
+    refreshToken: 'spotify_refresh_token',
+    expireTime: 'spotify_token_expire_time',
+    timestamp: 'spotify_token_timestamp'
+}
+
+// values for the localstorage key-value pairs
+const LOCALSTORAGE_VALUES = {
+    accessToken: window.localStorage.getItem(LOCALSTORAGE_KEYS.accessToken),
+    refreshToken: window.localStorage.getItem(LOCALSTORAGE_KEYS.refreshToken),
+    expireTime: window.localStorage.getItem(LOCALSTORAGE_KEYS.expireTime),
+    timestamp: window.localStorage.getItem(LOCALSTORAGE_KEYS.timestamp)
+}
+
+/**
+ * logs the current user out by clearing all localstorage items
+ */
+export const logout = () => {
+    for (const property in LOCALSTORAGE_KEYS) {
+        window.localStorage.removeItem(LOCALSTOARGE_KEYS[property]);
+    }
+
+    window.location = window.location.origin;
+}
+
+/**
+ * checks whether the access token has expired by calculating diff between expiretime and timestamp
+ */
+const hasTokenExpired = () => {
+    const {accessToken, timestamp, expireTime} = LOCALSTORAGE_VALUES
+
+    // we either don't have an access token to expire or a timestamp to check expiry
+    if (!accessToken || !timestamp) {
+        return false;
+    }
+
+    const millisecondsElapsed = Date.now() - Number(timestamp);
+    return (millisecondsElapsed/1000) > Number(expireTime);
+}
+
+/**
+ * Uses the refresh token saved in local storage to hit the /refresh_token endpoint and update 
+ * data in localStorage
+ * @returns {void}
+ */
+const refreshToken = async () => {
+    console.log('refreshing token');
+    try {
+        // log out if there's no refresh token saved or we've managed to get into a reload infinite loop
+        if(!LOCALSTORAGE_VALUES.refreshToken || 
+            LOCALSTORAGE_VALUES.refreshToken == 'undefined' ||
+            (Date.now() - Number(LOCALSTORAGE_VALUES.timestamp) / 1000) < 1000
+        ) {
+            console.error('no token available');
+            logout();
+        }
+
+        // get refresh token from 'refresh_token' endpoint on express app
+        const { data } = await axios.get(`/refresh_token?refresh_token=${LOCALSTORAGE_VALUES.refreshToken}`);
+
+        // update localStorage values
+        window.localStorage.setItem(LOCALSTORAGE_KEYS.accessToken, data.access_token);
+        window.localStorage.setItem()
+    } catch (e) {
+        console.error(e);
+    }
+}
+
 /**
  * function to get the access token from our url parameters when we get redirected to the React website.
  * @returns {string} access token
  */
 const getAccessToken = () => {
+    console.log('getting access token');
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
-    return urlParams.get('access_token');
+    const queryParams = {
+        [LOCALSTORAGE_KEYS.accessToken]: urlParams.get('access_token'),
+        [LOCALSTORAGE_KEYS.refreshToken]: urlParams.get('refresh_token'),
+        [LOCALSTORAGE_KEYS.expireTime]: urlParams.get('expires_in'),
+    }
+
+    const hasError = urlParams.get('error');
+
+    if (hasError || hasTokenExpired() || LOCALSTORAGE_VALUES.accessToken === 'undefined') {
+        refreshToken();
+    }
+
+    if(LOCALSTORAGE_VALUES.accessToken && LOCALSTORAGE_VALUES.accessToken !== 'undefined') {
+        console.log(LOCALSTORAGE_VALUES.accessToken);
+        return LOCALSTORAGE_VALUES.accessToken;
+    }
+
+    if(queryParams[LOCALSTORAGE_KEYS.accessToken]) {
+        for(const property in queryParams) {
+            window.localStorage.setItem(property, queryParams[property]);
+        }
+
+        window.localStorage.setItem(LOCALSTORAGE_KEYS.timestamp, Date.now());
+
+        return queryParams[LOCALSTORAGE_KEYS.accessToken]
+    }
+
+    return false;
 }
 
 export const accessToken = getAccessToken();

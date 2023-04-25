@@ -1,0 +1,45 @@
+@import './Variables.css';
+
+.playlist-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-gap: 2em;
+}
+
+.grid-item {
+    background: #111111;
+    transition: all 0.3s ease;
+    border-radius: var(--border-radius-sm);
+}
+
+.grid-item:hover {
+    filter: brightness(1.2);
+}
+
+.grid-item-inner {
+    padding: 1em;
+}
+
+.grid-item-image {
+    position: relative;
+    padding-top: 100%;
+    margin: 0 auto 1em;
+}
+
+.grid-item-image img {
+    position: absolute;
+    top: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--border-radius-sm);
+}
+
+.grid-item-title {
+    font-family: monospace;
+    font-size: 2em;
+    color: white;
+}
