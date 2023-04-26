@@ -7,7 +7,6 @@ require('dotenv').config();
 const port = '8888';
 
 // process variables
-const MUSIXMATCH_ID = process.env.MUSIXMATCH_ID;
 const CLIENT_ID = process.env.CLIENT_ID;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -102,7 +101,6 @@ app.get('/callback', (req, res) => {
                 access_token, refresh_token, expires_in
             })
             
-            // res.redirect(`http://localhost:8888/?${queryParams}`);
             res.redirect(`http://localhost:5173/?${queryParams}`);
         } else {
             res.redirect(`/?${querystring.stringify({ error: 'invalid_token'})}`);
@@ -113,13 +111,9 @@ app.get('/callback', (req, res) => {
     })
 })
 
-/**
- * refreshes the token. Sends a post request to spotify API with refresh token, returns response
- * which contains the new access token.
- */
 app.get('/refresh_token', (req, res) => {
-    const {refresh_token} = req.query;
-
+    const { refresh_token } = req.query;
+    
     axios({
         method: 'post',
         url: 'https://accounts.spotify.com/api/token',
@@ -127,10 +121,10 @@ app.get('/refresh_token', (req, res) => {
             grant_type: 'refresh_token',
             refresh_token: refresh_token
         }),
-        headers: ({
+        headers: {
             'content-type': 'application/x-www-form-urlencoded',
             Authorization: `Basic ${new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
-        })
+        },
     })
     .then(response => {
         res.send(response.data);

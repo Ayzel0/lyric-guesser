@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { accessToken } from './spotify';
+import { accessToken, logout } from './spotify';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
+import './App.css'
 
 function App() {
   // function variables; initially sets token var to null
@@ -21,11 +22,15 @@ function App() {
         {!token ? (
           <Login />
         ) : (
-          <Router>
-            <Routes>
-              <Route path="/" element={<Profile/>}/>
-            </Routes>
-          </Router>
+          <div className='logged-in-content'>
+            <button className='logout-button' onClick={logout}>Log Out</button>
+            <Router>
+              <Routes>
+                <Route path="/" element={<Profile/>}/>
+                <Route path="/top-artists" element={<h1>Top Artists</h1>}/>
+              </Routes>
+            </Router>
+          </div>
         )}
       </div>
     </>

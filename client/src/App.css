@@ -1,23 +1,24 @@
-html {
-    box-sizing: border-box;
-}
-
-*,
-*:before, *:after {
-    box-sizing: inherit;
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    max-width: 100%;
-    min-height: 100%;
-    overflow-x: hidden;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    background-color: black;
+.logout-button {
+    position: fixed;
+    top: 1em;
+    right: 1em;
+    border: 2px solid black;
+    border-radius: 10px;
+    background-color: #222;
+    padding: 10px 20px;
+    font-size: 1.25em;
+    font-weight: 700;
     color: white;
-    font-family: var(--font);
-    font-size: var(--fz-md);
+    transition: all 0.25s ease;
+    font-family: monospace;
+    z-index: 100;
+}
+
+.logout-button:hover {
+    background-color: #333;
+    border: 2px solid #222;
+}
+
+.logged-in-content {
+    margin: 2em;
 }
